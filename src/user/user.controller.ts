@@ -9,6 +9,9 @@ import {
   Logger,
   UseInterceptors,
   UploadedFile,
+  applyDecorators,
+  UseGuards,
+  Get,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
@@ -16,11 +19,14 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SignInUserDto } from './dto/signInUserDto';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { UserAuthenticationGuard } from 'src/middleware/authToken';
 
 @Controller('/users')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post('/register')
   async createUser(
@@ -60,7 +66,7 @@ export class UserController {
   }
 
   @Post('/signin')
-  async signIn(@Res() res: Response, @Body() user: CreateUserDto) {
+  async signIn(@Res() res: Response, @Body() user: SignInUserDto) {
     try {
       const result = await this.userService.signin(user);
 
@@ -79,8 +85,27 @@ export class UserController {
     }
   }
 
+  @Get('/get')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
+  async getUserId(@Request() req, @Res() res: Response) {
+    try {
+      const user = await this.userService.getUserById(req.user.id);
+      delete user.password
+      return res.json(user);
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
   @Patch('/update')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   @UseInterceptors(FileInterceptor('profilePic'))
+  @ApiConsumes('multipart/form-data')
   async updateUser(
     @UploadedFile() profilePic: Express.Multer.File,
     @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,

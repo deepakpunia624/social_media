@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import { UserAuthenticationMiddleware } from './middleware/authToken';
 import { PostModule } from './post/post.module';
 import { FriendRequestModule } from './friend_request/friend_request.module';
 import { CommentModule } from './comment/comment.module';
@@ -38,25 +37,5 @@ import { LikeModule } from './like/like.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(UserAuthenticationMiddleware)
-      .forRoutes(
-        'users/update',
-        'post/create',
-        'post/me',
-        'post/:id',
-        'friend-request/send',
-        'friend-request/:id',
-        'friend-request/requests',
-        'friend-request/friends/:id',
-        'comment/create/:postId',
-        'comment/:postId',
-        'comment/delete/:id',
-        'like/:postId',
-        'like/unlike/:postId',
-        'like/count/:postId'
-      );
-  }
-}
+
+export class AppModule {}

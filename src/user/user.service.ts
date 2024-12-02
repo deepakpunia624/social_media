@@ -8,6 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { CloudinaryResponse } from './entities/cloudinary.response';
+import { SignInUserDto } from './dto/signInUserDto';
 const streamifier = require('streamifier');
 
 @Injectable()
@@ -35,7 +36,7 @@ export class UserService {
     }
   }
 
-  async signin(user: CreateUserDto): Promise<any> {
+  async signin(user: SignInUserDto): Promise<any> {
     const foundUser = await this.userRepository.findOne({
       where: { email: user.email },
     });
@@ -58,6 +59,21 @@ export class UserService {
       }
     } else {
       throw new Error('User not found');
+    }
+  }
+
+  async getUserById(userId: number): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return user;
+    } catch (error) {
+      throw new Error(error.message);
     }
   }
 

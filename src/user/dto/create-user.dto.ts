@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsEmail,
@@ -11,16 +12,18 @@ export class CreateUserDto {
   id: number;
 
   @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ type: 'string', example: 'john' })
   fullName: string;
 
   @IsNotEmpty()
   @MinLength(10)
   @Transform(({ value }: TransformFnParams) => value.toString())
+  @ApiProperty({ type: 'number', example: '9999999999' })
   phoneNumber: number;
 
   @IsNotEmpty()
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email format.' })
+  @ApiProperty({ type: 'string', example: 'example@gmail.com' })
   email: string;
 
   @IsNotEmpty()
@@ -35,11 +38,13 @@ export class CreateUserDto {
   @Matches(/^(?=.*[^A-Za-z0-9]).{6,}$/, {
     message: 'Password must contain at least one special character.',
   })
+  @ApiProperty({ type: 'string', example: 'example@123' })
   password: string;
 
   profilePic: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({ type: 'string', example: 'example@123' })
   confirmPassword: string;
 }

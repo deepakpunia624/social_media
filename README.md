@@ -108,13 +108,23 @@ POST http://localhost:3000/like/{postId} - Like a post.
 POST http://localhost:3000/like/unlike/{postId} - Unlike a post.
 
 GET http://localhost:3000/like/count/{postId} - Get the total number of likes for a specific post.
+
+```
+
+# 5. Swagger Integration
+```bash
+
+#The application is integrated with Swagger for API documentation.
+
+Swagger URL: http://localhost:3000/api
+
 Notes
 
 # Ensure your .env file is correctly configured before running the application.
 
-# Please update bearer token before hit an api
+# Update the Bearer token before testing protected APIs.
 
-# Use tools like Postman or curl to test API endpoints during development.
+# Use tools like Postman, curl, or Swagger UI to test API endpoints during development.
 
 ```
 

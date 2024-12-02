@@ -7,9 +7,13 @@ import {
   Delete,
   Res,
   Logger,
+  applyDecorators,
+  UseGuards,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { Response } from 'express';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { UserAuthenticationGuard } from 'src/middleware/authToken';
 
 @Controller('/like')
 export class LikeController {
@@ -17,6 +21,8 @@ export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
   @Post('/:postId')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async likePost(
     @Param('postId') postId: number,
     @Request() req: any,
@@ -42,6 +48,8 @@ export class LikeController {
   }
 
   @Delete('/unlike/:postId')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async unlikePost(
     @Param('postId') postId: number,
     @Request() req: any,
@@ -65,6 +73,8 @@ export class LikeController {
   }
 
   @Get('/count/:postId')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async getLikeCount(@Param('postId') postId: number, @Res() res: Response) {
     try {
       const likeCount = await this.likeService.getLikesByPostId(postId);

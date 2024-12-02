@@ -11,26 +11,36 @@ import {
   Req,
   Delete,
   Param,
+  ValidationPipe,
+  applyDecorators,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PostService } from './post.service';
 import { Response } from 'express';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UserAuthenticationGuard } from 'src/middleware/authToken';
 
 @Controller('/post')
+@ApiTags('Posts')
 export class PostController {
   private readonly logger = new Logger(PostController.name);
   constructor(private readonly postService: PostService) {}
 
   @Post('/create')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
   async createPost(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: any,
+    @Body(new ValidationPipe()) createPostDto: CreatePostDto,
     @Res() res: Response,
     @Request() req: any,
   ) {
     try {
-      const { content } = body;
+      const { content } = createPostDto;
 
       const createPost = await this.postService.uploadPost(
         file,
@@ -54,6 +64,8 @@ export class PostController {
   }
 
   @Get('/me')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async getAllMyPosts(@Res() res: Response, @Request() req: any) {
     try {
       const userId = req.user.id;
@@ -82,6 +94,8 @@ export class PostController {
   }
 
   @Delete('/:id')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async deletePost(
     @Param('id') id: number,
     @Request() req,
@@ -112,6 +126,8 @@ export class PostController {
   }
 
   @Get('friends/:id')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async getPostsByUser(
     @Param('id') userId: number,
     @Req() req: any,

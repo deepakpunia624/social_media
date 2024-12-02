@@ -9,23 +9,34 @@ import {
   Logger,
   Put,
   Req,
+  ValidationPipe,
+  applyDecorators,
+  UseGuards,
 } from '@nestjs/common';
 import { FriendRequestService } from './friend_request.service';
 import { Response } from 'express';
+import { CreateFriendRequestDto } from './dto/create-friend_request.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserAuthenticationGuard } from 'src/middleware/authToken';
+import { UpdateFriendRequestDto } from './dto/update-friend_request.dto';
 
+@ApiTags('Friend-request')
 @Controller('/friend-request')
 export class FriendRequestController {
   private readonly logger = new Logger(FriendRequestController.name);
   constructor(private readonly friendRequestService: FriendRequestService) {}
 
   @Post('/send')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async sendFriendRequest(
-    @Body('receiverId') receiverId: number,
+    @Body(new ValidationPipe()) createFriendRequestDto: CreateFriendRequestDto,
     @Request() req: any,
     @Res() res: Response,
   ) {
     try {
       const senderId = req.user.id;
+      const { receiverId } = createFriendRequestDto;
       const friendRequest = await this.friendRequestService.sendFriendRequest(
         senderId,
         receiverId,
@@ -48,11 +59,15 @@ export class FriendRequestController {
   }
 
   @Put('/:id')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async updateRequestStatus(
     @Param('id') id: number,
-    @Body('status') status: 'pending' | 'accepted' | 'rejected',
+    @Body(new ValidationPipe()) updateFriendRequestDto: UpdateFriendRequestDto,
   ) {
     try {
+      const { status } = updateFriendRequestDto;
+      
       const updatedRequest =
         await this.friendRequestService.updateRequestStatus(id, status);
       this.logger.log('info', 'Request status updated successfully');
@@ -70,6 +85,8 @@ export class FriendRequestController {
   }
 
   @Get('/requests')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async getAllFriendRequests(@Req() req: any) {
     try {
       const receiverId = req.user.id;

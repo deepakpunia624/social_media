@@ -9,18 +9,25 @@ import {
   ValidationPipe,
   Logger,
   Delete,
+  applyDecorators,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Response } from 'express';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './entities/comment.entity';
+import { UserAuthenticationGuard } from 'src/middleware/authToken';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Comment')
 @Controller('/comment')
 export class CommentController {
   private readonly logger = new Logger(CommentController.name);
   constructor(private readonly commentService: CommentService) {}
 
   @Post('/create/:postId')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async createComment(
     @Param('postId') postId: number,
     @Request() req: any,
@@ -50,6 +57,8 @@ export class CommentController {
   }
 
   @Get('/:postId')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async getCommentsByPostId(
     @Param('postId') postId: number,
   ): Promise<Comment[]> {
@@ -67,6 +76,8 @@ export class CommentController {
   }
 
   @Delete('/delete/:id')
+  @applyDecorators(ApiBearerAuth())
+  @UseGuards(UserAuthenticationGuard)
   async deleteComment(
     @Param('id') commentId: number,
     @Request() req: any,
