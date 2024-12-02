@@ -93,7 +93,6 @@ PUT http://localhost:3000/friend-request/{requestId} - Update friend-request sta
 
 GET http://localhost:3000/friend-request/requests - Get all pending friend requests for the current user.
 
-
 5. Comments
 
 POST http://localhost:3000/comment/create/{postId} - Add a comment to a post.
@@ -109,10 +108,11 @@ POST http://localhost:3000/like/{postId} - Like a post.
 POST http://localhost:3000/like/unlike/{postId} - Unlike a post.
 
 GET http://localhost:3000/like/count/{postId} - Get the total number of likes for a specific post.
-
 Notes
 
 # Ensure your .env file is correctly configured before running the application.
+
+# Please update bearer token before hit an api
 
 # Use tools like Postman or curl to test API endpoints during development.
 
