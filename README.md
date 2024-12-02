@@ -73,6 +73,8 @@ Post http://localhost:3000/users/signin - Log in a user.
 
 Post http://localhost:3000/users/register - Register a new user.
 
+Get  http://localhost:3000/users/get - Get user details
+
 Patch http://localhost:3000/users/update - Update user information.
 
 2. Post
